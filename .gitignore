@@ -1,0 +1,14 @@
+# Ignore Mac system files
+.DS_Store
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+
+# Ignore the HUGE Virtual Environment (The culprit!)
+venv/
+backend/venv/
+backend/models/
+
+# Ignore Environment Variables
+.env
