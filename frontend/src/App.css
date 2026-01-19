@@ -4,6 +4,7 @@
   padding: 2rem;
   text-align: center;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: white;
 }
 
 .container {
@@ -22,6 +23,7 @@ h1 { color: #646cff; }
   display: flex;
   gap: 10px;
   align-items: center;
+  border: 1px solid #333;
 }
 
 button {
@@ -32,10 +34,11 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  transition: all 0.2s;
 }
 
+button:hover:not(:disabled) { background-color: #535bf2; transform: translateY(-1px); }
 button:disabled { background-color: #555; cursor: not-allowed; }
-button:hover:not(:disabled) { background-color: #535bf2; }
 
 .results-area {
   display: flex;
@@ -44,6 +47,13 @@ button:hover:not(:disabled) { background-color: #535bf2; }
   align-items: flex-start;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+}
+
+.image-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .xray-img {
@@ -56,12 +66,49 @@ button:hover:not(:disabled) { background-color: #535bf2; }
 
 .preview { opacity: 0.7; }
 
+/* CONTROLS BAR */
+.controls {
+  margin-top: 15px;
+  display: flex;
+  gap: 15px;
+  background: #242424;
+  padding: 10px 20px;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.toggle-btn {
+  background-color: #333;
+  border: 1px solid #555;
+}
+
+.toggle-btn.active {
+  background-color: #ff4444; /* Red when active (XAI Mode) */
+  border-color: #ff4444;
+}
+
+.download-group {
+  display: flex;
+  gap: 5px;
+  border-left: 1px solid #555;
+  padding-left: 15px;
+}
+
+.download-group button {
+  background-color: #333;
+  padding: 8px 12px;
+  font-size: 0.9em;
+}
+
+.download-group button:hover { background-color: #444; }
+
 .report-panel {
   text-align: left;
   background: #242424;
   padding: 20px;
   border-radius: 8px;
   min-width: 250px;
+  border: 1px solid #333;
 }
 
 ul { list-style: none; padding: 0; }
@@ -74,6 +121,4 @@ li {
 }
 
 li.issue { border-left: 5px solid #ff4444; }
-li.healthy { border-left: 5px solid #00cc66; }
-
 .conf { font-size: 0.85em; color: #aaa; }
