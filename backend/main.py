@@ -10,7 +10,7 @@ from inference import setup_system, run_inference
 # Global Variable to hold models
 MODELS = {}
 
-# --- LIFESPAN (The Modern Way to Load Models) ---
+# ---to Load Models---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 1. Startup: Load Models
@@ -25,12 +25,12 @@ async def lifespan(app: FastAPI):
         MODELS['effnet'] = eff_model
         print("✅ System Ready!")
     else:
-        print("❌ Error: Model files not found in /models folder!")
+        print("Error: Model files not found in /models folder!")
     
     yield  # The application runs here
     
     # 2. Shutdown: Clean up (if needed)
-    print("🛑 Shutting down system...")
+    print("Shutting down system...")
     MODELS.clear()
 
 # Initialize App with Lifespan

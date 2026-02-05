@@ -86,7 +86,7 @@ def setup_system(yolo_path, effnet_path):
     eff_model.to(device)
     eff_model.eval()
     
-    print("✅ Models Loaded.")
+    print("Models Loaded.")
     return yolo_model, eff_model
 
 def apply_clahe(img_bgr):
