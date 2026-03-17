@@ -17,11 +17,11 @@ EFFNET_CONF_MIN = 0.70
 PADDING         = 0.10
 
 CLASS_COLORS = {
-    'bdc_bdr':   (0, 165, 255),
-    'caries':    (0, 0, 255),
-    'fractured': (255, 0, 0),
-    'impacted':  (0, 255, 255),
-    'infection': (0, 255, 0),
+    'bdc_bdr':   (255,  68, 255),   # #FF44FF  magenta
+    'caries':    (  0, 165, 255),   # #FFA500  orange
+    'fractured': ( 68, 255, 255),   # #FFFF44  yellow
+    'impacted':  (247, 158,  77),   # #4d9ef7  blue
+    'infection': ( 68,  68, 255),   # #FF4444  red
 }
 
 CLASS_LABELS = {
@@ -69,9 +69,10 @@ class GradCAM:
     def save_gradient(self, module, grad_input, grad_output):
         self.gradients = grad_output[0]
 
-    def generate_heatmap(self, input_tensor, class_idx):
+    def generate_heatmap(self, input_tensor, class_idx, output=None):
         self.model.zero_grad()
-        output = self.model(input_tensor)
+        if output is None:
+            output = self.model(input_tensor)
         output[0][class_idx].backward()
 
         gradients  = self.gradients[0].cpu().data.numpy()
@@ -197,9 +198,7 @@ def run_inference(image_bytes, yolo_model, eff_model, grad_cam):
 
             crop_pil     = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
             input_tensor = preprocess(crop_pil).unsqueeze(0).to(device)
-            input_tensor.requires_grad = True
 
-            eff_model.zero_grad()
             outputs       = eff_model(input_tensor)
             probabilities = F.softmax(outputs, dim=1)
             top_prob, top_idx = torch.max(probabilities, 1)
@@ -216,8 +215,8 @@ def run_inference(image_bytes, yolo_model, eff_model, grad_cam):
                 confidence = top_prob2.item()
                 top_idx    = top_idx2
 
-            # Grad-CAM heatmap
-            heatmap = grad_cam.generate_heatmap(input_tensor, top_idx.item())
+            # Grad-CAM heatmap — reuse the same forward pass output to avoid a second inference
+            heatmap = grad_cam.generate_heatmap(input_tensor, top_idx.item(), output=outputs)
             heatmap = np.uint8(255 * heatmap)
             heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
             heatmap_resized = cv2.resize(heatmap, (crop.shape[1], crop.shape[0]))
