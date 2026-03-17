@@ -12,3 +12,17 @@ backend/models/
 
 # Ignore Environment Variables
 .env
+
+# Node.js dependencies
+node_modules/
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+frontend/build/
+frontend/.next/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
