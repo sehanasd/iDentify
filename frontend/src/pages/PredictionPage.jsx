@@ -2,7 +2,8 @@ import { useState, useRef, useCallback } from 'react'
 import FindingsPanel from '../components/FindingsPanel'
 import './PredictionPage.css'
 
-const API = '/api'
+// const API = '/api'
+const API = import.meta.env.VITE_API_URL
 const STATUS = { IDLE: 'idle', VALIDATING: 'validating', READY: 'ready', ANALYSING: 'analysing', DONE: 'done', ERROR: 'error' }
 
 export default function PredictionPage() {
