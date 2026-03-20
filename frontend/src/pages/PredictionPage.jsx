@@ -14,12 +14,18 @@ export default function PredictionPage() {
   const [result, setResult]     = useState(null)
   const [xaiMode, setXaiMode]   = useState(false)
   const [dragging, setDragging] = useState(false)
-  const inputRef = useRef()
+  const inputRef    = useRef()
+  const previewUrl  = useRef(null)
 
   const handleFile = useCallback(async (f) => {
     if (!f) return
+    if (previewUrl.current) {
+      URL.revokeObjectURL(previewUrl.current)
+    }
+    const objectUrl = URL.createObjectURL(f)
+    previewUrl.current = objectUrl
     setResult(null); setErrorMsg(''); setXaiMode(false)
-    setPreview(URL.createObjectURL(f))
+    setPreview(objectUrl)
     setFile(f)
     setStatus(STATUS.VALIDATING)
 
@@ -27,6 +33,12 @@ export default function PredictionPage() {
     fd.append('file', f)
     try {
       const res  = await fetch(`${API}/validate`, { method: 'POST', body: fd })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setStatus(STATUS.ERROR)
+        setErrorMsg(data.detail || `Validation error (${res.status})`)
+        return
+      }
       const data = await res.json()
       if (!data.valid) { setStatus(STATUS.ERROR); setErrorMsg(data.reason) }
       else              { setStatus(STATUS.READY) }
@@ -48,9 +60,14 @@ export default function PredictionPage() {
     fd.append('file', file)
     try {
       const res  = await fetch(`${API}/predict`, { method: 'POST', body: fd })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setStatus(STATUS.ERROR)
+        setErrorMsg(data.detail || `Server error (${res.status})`)
+        return
+      }
       const data = await res.json()
-      if (data.error) { setStatus(STATUS.ERROR); setErrorMsg(data.reason) }
-      else            { setResult(data); setStatus(STATUS.DONE) }
+      setResult(data); setStatus(STATUS.DONE)
     } catch {
       setStatus(STATUS.ERROR)
       setErrorMsg('Analysis failed. Make sure the backend is running and models are loaded.')
@@ -58,6 +75,10 @@ export default function PredictionPage() {
   }
 
   const reset = () => {
+    if (previewUrl.current) {
+      URL.revokeObjectURL(previewUrl.current)
+      previewUrl.current = null
+    }
     setStatus(STATUS.IDLE); setFile(null); setPreview(null)
     setResult(null); setErrorMsg(''); setXaiMode(false)
     if (inputRef.current) inputRef.current.value = ''
